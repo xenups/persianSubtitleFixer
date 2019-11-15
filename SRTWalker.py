@@ -1,14 +1,19 @@
 import os
+import logging
+import threading
 
 
-class SRTHandler:
-    def __init__(self, path):
+class SubFinderThread(threading.Thread):
+    def __init__(self, cb, path):
+        threading.Thread.__init__(self)
+        self.callback = cb
         self.path = path
-        self.files = []
 
-    def search_srt_files(self):
+    def run(self):
+        files_list = []
+        logging.info("Thread %s: starting", 'started')
         for root, dirs, files in os.walk(self.path):
             for file in files:
                 if file.endswith(".srt"):
-                    self.files.append(os.path.join(root, file))
-        return self.files
+                    files_list.append(os.path.join(root, file))
+                    self.callback(os.path.join(root, file))

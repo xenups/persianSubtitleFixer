@@ -6,6 +6,8 @@ from SRTWalker import SubFinderThread
 from tkinter.messagebox import showinfo
 from functools import partial
 
+from subtitleConvertor import SubtitleConvertor
+
 
 class MainGUI(tk.Tk):
     def __init__(self, *args, **kwargs):
@@ -14,37 +16,44 @@ class MainGUI(tk.Tk):
         self.geometry('700x300')
         self.title('SRT Converter')
         container = tk.Frame(self)
-
+        self.list_file_address = []
         container.pack(side="top", fill="both", expand=True)
         self.store_button = Button(self, text='select path', command=self.open_dialogue, bd=4, width=10,
-                                   activebackground='lightgrey', font='Bnazanin 10 bold')
+                                   activebackground='lightgrey')
         self.store_button.place(x=10, y=50)
+
+        self.convert_button = Button(self, text='convert', command=self.convert, bd=4, width=10,
+                                     activebackground='lightgrey')
+        self.convert_button.place(x=100, y=50)
+
         self.path_label = Label(self, text=" path ")
         self.path_label.place(x=10, y=10)
-
         self.last_search_label = Label(self, text="  ")
         self.last_search_label.place(x=30, y=265)
-
         self.listbox = Listbox(container, width=100, height=10)
+        vertical_scrollbar = Scrollbar(container, orient="vertical", command=self.listbox.yview)
+        horizontal_scrollbar = Scrollbar(container, orient="horizontal", command=self.listbox.xview)
+        vertical_scrollbar.pack(side="right", fill="y")
+        horizontal_scrollbar.pack(side="bottom", fill="x")
 
-        vscrollbar = Scrollbar(container, orient="vertical", command=self.listbox.yview)
-        hscrollbar = Scrollbar(container, orient="horizontal", command=self.listbox.xview)
-
-        vscrollbar.pack(side="right", fill="y")
-        hscrollbar.pack(side="bottom", fill="x")
-
-        self.listbox.config(xscrollcommand=hscrollbar.set, yscrollcommand=vscrollbar.set)
+        self.listbox.config(xscrollcommand=horizontal_scrollbar.set, yscrollcommand=vertical_scrollbar.set)
         self.listbox.pack()
         self.listbox.place(x=30, y=100)
         self.listbox.insert(END, "a list entry")
-        # self.listbox.config(width=0)
 
     def add_subtitle_to_listbox(self, names):
         self.listbox.insert(END, names)
         self.last_search_label.config(text=names)
+        self.list_file_address.append(names)
+
+    def notify_subtitle_converted(self, names):
+        self.listbox.insert(END, names)
+        self.last_search_label.config(text=names)
+
 
     def open_dialogue(self):
         try:
+            self.list_file_address = []
             folder_name = filedialog.askdirectory()
             self.path_label.config(text=folder_name)
             if folder_name:
@@ -55,7 +64,12 @@ class MainGUI(tk.Tk):
         except:
             messagebox.showerror("ERROR", "Problem in opening folder")
 
-        # self.store_button['state'] = DISABLED
+    def convert(self):
+        if self.list_file_address:
+            self.listbox.delete(0, tk.END)
+            self.last_search_label.config(text=" ")
+            t = SubtitleConvertor(self.notify_subtitle_converted, self.list_file_address)
+            t.start()
 
 
 if __name__ == "__main__":

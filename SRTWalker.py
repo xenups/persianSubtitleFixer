@@ -1,3 +1,5 @@
+import codecs
+import encodings
 import os
 import logging
 import threading

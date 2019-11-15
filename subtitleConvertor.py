@@ -2,6 +2,14 @@ import os
 import threading
 from pathlib import Path
 import codecs
+from named_constants import Constants
+
+
+class Encoding(Constants):
+    utf8 = 'utf-8'
+    windows1250 = 'windows-1250'
+    windows1252 = 'windows-1252'
+    windows1256 = 'windows-1256'
 
 
 class SubtitleConvertor(threading.Thread):
@@ -12,7 +20,7 @@ class SubtitleConvertor(threading.Thread):
 
     def get_file_encoding(self, path):
         print(path)
-        encodings = ['utf-8', 'windows-1250', 'windows-1252']
+        encodings = [Encoding.windows1250, Encoding.windows1252, Encoding.windows1256]
         for e in encodings:
             try:
                 fh = codecs.open(path, 'r', encoding=e)
@@ -23,20 +31,19 @@ class SubtitleConvertor(threading.Thread):
             else:
                 return e
 
-    def ansi_to_utf8(self, path):
-        with codecs.open(path, 'r', encoding='windows-1256', errors='ignore') as file:
+    def convert_fromat(self, path, source_encoding):
+        self.callback('Trying to convert from ' + source_encoding)
+        with codecs.open(path, 'r', encoding=source_encoding, errors='ignore') as file:
             lines = file.read()
             # print(lines)
         # write output file
         converted_name = os.path.splitext(path)[0] + ' converted.srt'
         with codecs.open(converted_name, 'w', encoding='utf-8') as file:
             file.write(lines)
+        self.callback(path + ' converted')
 
     def run(self):
-        sourceFormats = ['ascii', 'iso-8859-1']
         for path in self.files_path:
-            if self.get_file_encoding(path) != 'utf-8':
-                self.ansi_to_utf8( path)
-                self.callback(path + ' converted')
-        else:
-            self.callback(path + ' not converted')
+            source_format = self.get_file_encoding(path)
+            print(source_format)
+            self.convert_fromat(path, source_format)

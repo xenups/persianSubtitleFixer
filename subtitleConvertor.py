@@ -1,6 +1,5 @@
 import os
 import threading
-from pathlib import Path
 import codecs
 from named_constants import Constants
 
@@ -31,7 +30,7 @@ class SubtitleConvertor(threading.Thread):
             else:
                 return e
 
-    def convert_fromat(self, path, source_encoding):
+    def convert_format(self, path, source_encoding):
         self.callback('Trying to convert from ' + source_encoding)
         with codecs.open(path, 'r', encoding=source_encoding, errors='ignore') as file:
             lines = file.read()
@@ -45,5 +44,5 @@ class SubtitleConvertor(threading.Thread):
     def run(self):
         for path in self.files_path:
             source_format = self.get_file_encoding(path)
-            print(source_format)
-            self.convert_fromat(path, source_format)
+            if source_format != "utf-8":
+                self.convert_format(path, source_format)

@@ -25,9 +25,7 @@ class MainGUI(tk.Tk):
         # initialize the main window
 
         tk.Tk.__init__(self, *args, **kwargs)
-        self.geometry('700x310')
-        self.resizable(width=FALSE, height=FALSE)
-
+        self.geometry('800x400')
         self.title('SRT Converter')
         container = tk.Frame(self)
         self.center()
@@ -35,17 +33,17 @@ class MainGUI(tk.Tk):
         container.pack(side="top", fill="both", expand=True)
 
         self.store_button = Button(self, text='Select Folder', command=self.open_dialogue, bd=2, width=10,
-                                   activebackground='lightgrey')
-        self.store_button.place(x=30, y=50)
+                                   compound=tk.TOP, activebackground='lightgrey').pack(side="right")
+        self.convert_button = Button(self, text='Convert', command=self.convert_action, bd=2, width=10, compound=tk.TOP,
+                                     activebackground='lightgrey').pack(side="right")
 
-        self.convert_button = Button(self, text='Convert', command=self.convert_action, bd=2, width=10,
-                                     activebackground='lightgrey')
-        self.convert_button.place(x=120, y=50)
+        self.path_label = Label(self, compound=tk.TOP, text=" path label")
+        self.path_label.pack(side="bottom")
+        # self.path_label.grid()
 
-        self.path_label = Label(self, text=" ")
-        self.path_label.place(x=10, y=10)
-        self.last_search_label = Label(self, text="  ")
-        self.last_search_label.place(x=30, y=265)
+        self.last_search_label = Label(self, compound=tk.CENTER, text=" search label")
+        self.last_search_label.pack(side="top")
+
         self.listbox = Listbox(container, width=100, height=10)
         vertical_scrollbar = Scrollbar(container, orient="vertical", command=self.listbox.yview)
         horizontal_scrollbar = Scrollbar(container, orient="horizontal", command=self.listbox.xview)
@@ -53,8 +51,7 @@ class MainGUI(tk.Tk):
         horizontal_scrollbar.pack(side="bottom", fill="x")
 
         self.listbox.config(xscrollcommand=horizontal_scrollbar.set, yscrollcommand=vertical_scrollbar.set)
-        self.listbox.pack()
-        self.listbox.place(x=30, y=100)
+        self.listbox.pack(side="top", fill="both", expand=True)
         self.listbox.insert(END, "found subtitles: ")
 
     def add_subtitle_to_listbox(self, names):
@@ -67,17 +64,19 @@ class MainGUI(tk.Tk):
         self.last_search_label.config(text=names)
 
     def open_dialogue(self):
-        try:
-            self.list_file_address = []
-            folder_name = filedialog.askdirectory()
-            self.path_label.config(text=folder_name)
-            if folder_name:
-                self.listbox.delete(0, tk.END)
-                self.last_search_label.config(text=" ")
-                t = SubFinderThread(self.add_subtitle_to_listbox, folder_name)
-                t.start()
-        except:
-            messagebox.showerror("ERROR", "Problem in opening folder")
+        # try:
+        self.list_file_address = []
+        folder_name = filedialog.askdirectory()
+        self.path_label.configure(text="Path : "+folder_name)
+        # self.path_label["text"] = folder_name
+        if folder_name:
+            self.listbox.delete(0, tk.END)
+            self.last_search_label.configure(text=" ")
+            t = SubFinderThread(self.add_subtitle_to_listbox, folder_name)
+            t.start()
+
+    # except:
+    #     messagebox.showerror("ERROR", "Problem in opening folder")
 
     def convert_action(self):
         if self.list_file_address:
@@ -95,5 +94,9 @@ class MainGUI(tk.Tk):
 if __name__ == "__main__":
     app = MainGUI()
     app.title("Persian/Arabic Subtitle Fixer")
-    app.iconbitmap("icon.ico")
+    try:
+        app.iconbitmap("icon.ico")
+    except:
+        pass
+        # tk.messagebox.showerror("Icon Error", "Couldnt find any icon")
     app.mainloop()

@@ -37,11 +37,11 @@ class MainGUI(tk.Tk):
         self.convert_button = Button(self, text='Convert', command=self.convert_action, bd=2, width=10, compound=tk.TOP,
                                      activebackground='lightgrey').pack(side="right")
 
-        self.path_label = Label(self, compound=tk.TOP, text=" path label")
+        self.path_label = Label(self, compound=tk.TOP, text=" path ")
         self.path_label.pack(side="bottom")
         # self.path_label.grid()
 
-        self.last_search_label = Label(self, compound=tk.CENTER, text=" search label")
+        self.last_search_label = Label(self, compound=tk.CENTER, text=" search ")
         self.last_search_label.pack(side="top")
 
         self.listbox = Listbox(container, width=100, height=10)

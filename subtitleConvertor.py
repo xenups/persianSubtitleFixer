@@ -16,6 +16,7 @@ class SubtitleConvertor(threading.Thread):
         threading.Thread.__init__(self)
         self.files_path = list_file_address
         self.callback = cb
+        self.status = " "
 
     def get_file_encoding(self, path):
         print(path)
@@ -31,7 +32,8 @@ class SubtitleConvertor(threading.Thread):
                 return e
 
     def convert_format(self, path, source_encoding):
-        self.callback('Trying to convert from ' + source_encoding)
+        status = "Converting"
+        self.callback('Trying to convert from ' + source_encoding,self.status)
         with codecs.open(path, 'r', encoding=source_encoding, errors='ignore') as file:
             lines = file.read()
             # print(lines)
@@ -39,10 +41,13 @@ class SubtitleConvertor(threading.Thread):
         converted_name = os.path.splitext(path)[0] + ' converted.srt'
         with codecs.open(converted_name, 'w', encoding='utf-8') as file:
             file.write(lines)
-        self.callback(path + ' converted')
+        self.callback(path + ' converted', status)
 
     def run(self):
         for path in self.files_path:
             source_format = self.get_file_encoding(path)
             if source_format != "utf-8":
                 self.convert_format(path, source_format)
+        self.status = "Finished"
+        self.callback(' ', self.status)
+

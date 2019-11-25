@@ -30,19 +30,19 @@ class MainGUI(tk.Tk):
         container = tk.Frame(self)
         self.center()
         self.list_file_address = []
+        self.statusbar = tk.Label(self, text="Ready", bd=1, relief=tk.SUNKEN, anchor=tk.W)
+        self.statusbar.pack(side=tk.BOTTOM, fill="x")
         container.pack(side="top", fill="both", expand=True)
 
         self.store_button = Button(self, text='Select Folder', command=self.open_dialogue, bd=2, width=10,
-                                   compound=tk.TOP, activebackground='lightgrey').pack(side="right")
+                                   compound=tk.TOP, activebackground='lightgrey').pack(side="right",padx=5, pady=5)
         self.convert_button = Button(self, text='Convert', command=self.convert_action, bd=2, width=10, compound=tk.TOP,
                                      activebackground='lightgrey').pack(side="right")
 
-        self.path_label = Label(self, compound=tk.TOP, text=" path ")
-        self.path_label.pack(side="bottom")
         # self.path_label.grid()
 
-        self.last_search_label = Label(self, compound=tk.CENTER, text=" search ")
-        self.last_search_label.pack(side="top")
+        self.last_search_label = Label(self, compound=tk.CENTER, text=" ... ")
+        self.last_search_label.pack(side="left")
 
         self.listbox = Listbox(container, width=100, height=10)
         vertical_scrollbar = Scrollbar(container, orient="vertical", command=self.listbox.yview)
@@ -54,20 +54,23 @@ class MainGUI(tk.Tk):
         self.listbox.pack(side="top", fill="both", expand=True)
         self.listbox.insert(END, "found subtitles: ")
 
-    def add_subtitle_to_listbox(self, names):
+    def add_subtitle_to_listbox(self, names, search_status):
         self.listbox.insert(END, names)
         self.last_search_label.config(text=names)
+        self.statusbar.config(text=search_status)
+
         self.list_file_address.append(names)
 
-    def notify_subtitle_converted(self, names):
+    def notify_subtitle_converted(self, names, convert_status):
         self.listbox.insert(END, names)
         self.last_search_label.config(text=names)
+        self.statusbar.config(text=convert_status)
 
     def open_dialogue(self):
         # try:
         self.list_file_address = []
         folder_name = filedialog.askdirectory()
-        self.path_label.configure(text="Path : "+folder_name)
+        self.statusbar.configure(text="Path : " + folder_name)
         # self.path_label["text"] = folder_name
         if folder_name:
             self.listbox.delete(0, tk.END)
